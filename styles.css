@@ -1,0 +1,416 @@
+/* ===== Theme ===== */
+:root {
+  --bg-main: #0d1117; /* фон всей страницы */
+  --bg-panel: #111827;
+  --bg-gradient: radial-gradient(circle at top left, #04090e 20%, #1f326b 100%);
+  --text-main: #dbe3ef;
+  --text-muted: #94a3b8;
+  --border-light: rgba(255, 255, 255, .05);
+  --border-strong: rgba(255, 255, 255, .12);
+}
+
+#ch-weld-def {
+  margin: 0 auto;
+  height: 155px !important;
+  width: 155px !important;
+}
+
+body {
+  background: var(--bg-gradient);
+  color: var(--text-main);
+  font-family: Inter, Segoe UI, system-ui, sans-serif;
+}
+
+.card,
+.tile {
+  background: var(--bg-panel2) !important;
+  border: 1px solid var(--border-light);
+  border-radius: 14px;
+  backdrop-filter: blur(8px);
+  transition: background .2s ease, transform .15s ease, box-shadow .2s ease;
+}
+
+.card:hover,
+.tile:hover {
+  background: #1d2a3b;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .45), inset 0 0 0 1px var(--border-strong);
+}
+
+/* эффект при наведении */
+.tile:hover {
+  background: #19273b;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, .06),
+    0 12px 25px rgba(0, 0, 0, .55);
+}
+
+.pill {
+  padding: 0.25rem .55rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: .75rem;
+  display: inline-block;
+}
+
+.pill-run {
+  background: rgba(26, 163, 107, .18);
+  color: #8df3c2;
+}
+
+.pill-stop {
+  background: rgba(232, 78, 78, .18);
+  color: #ff9c9c;
+}
+
+.pill-idle {
+  background: rgba(126, 166, 255, .18);
+  color: #bcd0ff;
+}
+
+.muted {
+  color: var(--text-muted) !important;
+}
+
+hr {
+  border-color: rgba(255, 255, 255, .08);
+}
+
+.border {
+  border-color: var(--border-light) !important;
+}
+
+.divider {
+  height: 1px;
+  background: rgba(255, 255, 255, .06);
+}
+
+.icon {
+  color: var(--accent);
+}
+
+/* ===== SPA view switch ===== */
+.view {
+  display: none;
+}
+
+.view.active {
+  display: block;
+}
+
+/* ===== Tabs with icons ===== */
+
+button.tile {
+  pointer-events: auto;
+}
+
+.btn-tab {
+  background: var(--panel2);
+  border-radius: 12px;
+  padding: .6rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: 2px solid transparent;
+}
+
+/* ==== Hover эффект для станций (btn-tab) ==== */
+.btn-tab {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-light);
+  border-radius: 14px;
+  transition: background .2s ease, transform .15s ease, box-shadow .2s ease;
+}
+
+.btn-tab:hover {
+  background: #1d2838;
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, .4), inset 0 0 0 1px var(--border-strong);
+}
+
+.btn-tab.active {
+  outline: 2px solid #223044;
+  background: #223044;
+  border-color: rgba(255, 255, 255, .08);
+}
+
+.tab-icon {
+  width: 110px;
+  height: 70px;
+  object-fit: contain;
+}
+
+.btn-tab.active .tab-icon {
+  transform: scale(1.03);
+}
+
+.btn-tab span {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+/* ===== Metric tiles (value badge) ===== */
+.metric {
+  position: relative;
+}
+
+.metric .label {
+  font-size: 1.5rem;
+  color: var(--muted);
+  margin-bottom: .35rem;
+}
+
+.metric .value-badge {
+  position: absolute;
+  right: 5px;
+  top: 17px;
+  background: rgba(255, 255, 255, .06);
+  border-radius: 10px;
+  padding: 2px 8px;
+  font-size: 1.10rem;
+  font-weight: 700;
+  color: #cfe8ff;
+}
+
+.status-tile {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-top: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+
+.status-tile:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.status-label {
+  font-size: large;
+  color: var(--muted);
+}
+
+.status-value {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* Кнопка Details */
+.btn-details {
+  font-size: .8rem;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #2563eb, #38bdf8);
+  color: #fff;
+  font-weight: 500;
+  box-shadow: 0 0 20px rgba(56, 189, 248, .45);
+  border: none;
+}
+
+.btn-details:hover {
+  filter: brightness(1.1);
+}
+
+/* Строки внутри карточек (CT, Remaining Production и т.д.) */
+.home-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, .9);
+  border: 1px solid rgba(148, 163, 184, .25);
+  font-size: .9rem;
+}
+
+.home-row + .home-row {
+  margin-top: 8px;
+}
+
+.home-row-label {
+  color: var(--muted);
+}
+
+.home-row-value {
+  font-weight: 600;
+}
+
+/* Кольцевая метрика 72% */
+.donut {
+  width: 120px;
+  height: 120px;
+  border-radius: 999px;
+  background: conic-gradient(#3b82f6 0 260deg, #1f2937 260deg 360deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.donut-inner {
+  width: 70%;
+  height: 70%;
+  border-radius: 999px;
+  background: #020617;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.spark {
+  height: 140px;
+  width: 100%;
+}
+
+.spark.hidden {
+  display: none !important;
+}
+
+/* ---- Alarms panel ---- */
+.alarm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.alarm-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: var(--panel2);
+  border-radius: 12px;
+  padding: 10px 12px;
+  border-left: 4px solid transparent;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .04);
+}
+
+.alarm-item.active {
+  background: rgba(232, 78, 78, .06);
+}
+
+.alarm-item .ai-title {
+  font-weight: 700;
+}
+
+.alarm-item .ai-desc {
+  font-size: .85rem;
+  color: var(--muted);
+}
+
+.alarm-item .ai-right {
+  margin-left: auto;
+  text-align: right;
+  font-size: .8rem;
+}
+
+.sev-high {
+  border-left-color: #ff5a5a;
+}
+
+.sev-medium {
+  border-left-color: #ffb43b;
+}
+
+.sev-low {
+  border-left-color: #2ecc71;
+}
+
+.alarm-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Кнопка переключения Metrics / Charts */
+.view-toggle {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 3px;
+  background: rgba(15, 31, 49, .9);
+  border: 1px solid rgba(255, 255, 255, .06);
+}
+
+.view-toggle-btn {
+  font-size: .75rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+}
+
+.view-toggle-btn.is-active {
+  background: #1c3b5a;
+  color: #fff;
+}
+
+.metric.metric-big {
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.metric.metric-big .label {
+  font-size: 1.5rem;
+  color: var(--muted);
+}
+
+.metric.metric-big .value-badge {
+  position: static;
+  margin-top: 12px;
+  align-self: flex-start;
+  background: transparent;
+  padding: 0;
+  font-size: 2.7rem;
+}
+
+.btn-small {
+  background: #122739;
+  border: 1px solid rgba(255, 255, 255, .08);
+  color: #cfe8ff;
+  font-size: .8rem;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.btn-small.active {
+  background: #1c3b5a;
+  color: #fff;
+}
+
+/* ===== Light Theme (Updated) ===== */
+.light-theme {
+  --bg-main: #f4f7fa; 
+  --bg-panel: #ffffff; 
+  --text-main: #1c1c1c; 
+  --text-muted: #555555; 
+  --border-light: rgba(0, 0, 0, .1); 
+  --border-strong: rgba(0, 0, 0, .15); 
+  --bg-gradient: linear-gradient(135deg, #e0e0e0 0%, #1f326b 100%); 
+}
+
+.light-theme .home-row {
+  background-color: #e4e4e4; 
+  border: 1px solid var(--border-light); 
+  color: var(--text-main); 
+}
+
+.light-theme .donut {
+  background: conic-gradient(#3b82f6 0 260deg, #a7c7eb 260deg 360deg); 
+}
+
+.light-theme .donut-inner {
+  background: #e4e4e4; 
+  color: #333; 
+}

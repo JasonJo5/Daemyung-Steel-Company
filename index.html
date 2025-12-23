@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Production Dashboard</title>
+
+  <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- External styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="min-h-dvh">
+  <!-- Metric overlay (moved inside body) -->
+  <div id="metric-overlay" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center">
+    <div class="card p-6 w-full max-w-4xl max-h-[80vh] flex flex-col">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <div class="text-xs uppercase muted" id="ovr-metric-path" data-i18n="metric_detail">Metric detail</div>
+          <div class="text-lg font-semibold" id="ovr-metric-title">—</div>
+        </div>
+        <button id="ovr-close" class="text-sm muted hover:text-white" data-i18n="close">✕ Close</button>
+      </div>
+      <div id="metric-chart-holder" class="flex-1">
+        <!-- canvas will be moved here -->
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-6 py-6">
+    <!-- HEADER -->
+    <header class="flex items-center justify-between mb-4">
+      <h1 class="text-xl sm:text-2xl font-semibold" data-i18n="title">Daemyung Steel Company</h1>
+
+      <div class="flex items-center gap-3 text-sm">
+        <button id="lang-toggle"
+                class="px-3 py-1 rounded-md border border-white/10 hover:bg-white/10">
+          한국어
+        </button>
+      
+        <button id="theme-toggle" class="px-3 py-1 rounded-md border border-white/10 hover:bg-white/10">
+          Mode
+        </button>
+
+        <div id="elapsed" class="text-sm tabular-nums">00 : 00 : 00</div>
+      </div>
+    </header>
+
+    <!-- HOME (overview) -->
+    <section id="view-home" class="view active">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Work Forecast -->
+        <div class="card p-6 flex flex-col gap-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-semibold" data-i18n="work_forecast">Work Forecast</h2>
+            <button class="btn-details">Details</button>
+          </div>
+
+          <div class="mt-3">
+            <div class="home-row">
+              <div class="home-row-label" data-i18n="ct">CT</div>
+              <div class="home-row-value tabular-nums">90초</div>
+            </div>
+            <div class="home-row">
+              <div class="home-row-label" data-i18n="remaining_prod">Remaining Production</div>
+              <div class="home-row-value tabular-nums">4,460</div>
+            </div>
+            <div class="home-row">
+              <div class="home-row-label" data-i18n="est_complete">Estimated Completion Time</div>
+              <div class="home-row-value tabular-nums">18:20</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Production Status -->
+        <div class="card p-6 flex flex-col gap-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-semibold" data-i18n="prod_status">Production Status</h2>
+            <button class="btn-details">Details</button>
+          </div>
+
+          <div class="mt-4 flex items-center justify-between gap-4">
+            <div class="flex-1 space-y-3">
+              <div class="home-row">
+                <div class="home-row-label" data-i18n="target">Target</div>
+                <div class="home-row-value tabular-nums">8,000</div>
+              </div>
+              <div class="home-row">
+                <div class="home-row-label" data-i18n="actual">Actual</div>
+                <div class="home-row-value tabular-nums">3,540</div>
+              </div>
+            </div>
+
+            <div class="donut">
+              <div class="donut-inner">72%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Equipment Status -->
+        <div class="card p-6 flex flex-col gap-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-semibold" data-i18n="equipment_status">Equipment Status</h2>
+            <button class="btn-details" data-i18n="details">Details</button>
+          </div>
+
+          <div class="mt-3">
+            <div class="home-row">
+              <div class="home-row-label" data-i18n="avail_rate">Availability Rate</div>
+              <div class="home-row-value tabular-nums">90%</div>
+            </div>
+            <div class="home-row">
+              <div class="home-row-label" data-i18n="fault_count">Fault Count</div>
+              <div class="home-row-value tabular-nums">10건</div>
+            </div>
+            <div class="home-row">
+              <div class="home-row-label" data-i18n="avg_fault">Avg Fault Time</div>
+              <div class="home-row-value tabular-nums">15분</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Worker Status -->
+        <div class="card p-6 flex flex-col gap-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-semibold" data-i18n="worker_status">Worker Status</h2>
+            <button class="btn-details" data-i18n="details">Details</button>
+          </div>
+
+          <div class="mt-6 flex flex-col lg:flex-row gap-6 items-start">
+            <div class="text-5xl font-extrabold tabular-nums">
+              120 / 86
+            </div>
+            <div class="flex-1 space-y-2">
+              <div class="home-row">
+                <div class="home-row-label">1조</div>
+                <div class="home-row-value tabular-nums">42명</div>
+              </div>
+              <div class="home-row">
+                <div class="home-row-label">2조</div>
+                <div class="home-row-value tabular-nums">44명</div>
+              </div>
+              <div class="home-row">
+                <div class="home-row-label">출근율</div>
+                <div class="home-row-value tabular-nums">93%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Line Status -->
+        <div class="card p-6 flex flex-col gap-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-semibold" data-i18n="line_status">Line Status</h2>
+            <button class="btn-details" data-i18n="details">Details</button>
+          </div>
+
+          <!-- rendered from renderHome() -->
+          <div id="line-grid" class="mt-4 grid grid-cols-4 sm:grid-cols-4 xl:grid-cols-4 gap-4"></div>
+        </div>
+
+        <!-- Quality Status -->
+        <div class="card p-6 flex flex-col gap-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-semibold" data-i18n="quality_status">Quality Status</h2>
+            <button class="btn-details" data-i18n="details">Details</button>
+          </div>
+
+          <div class="mt-3">
+            <div class="home-row">
+              <div class="home-row-label" data-i18n="defect_rate">Defect Rate</div>
+              <div class="home-row-value tabular-nums">12%</div>
+            </div>
+            <div class="home-row">
+              <div class="home-row-label" data-i18n="rework_rate">Rework Rate</div>
+              <div class="home-row-value tabular-nums">20%</div>
+            </div>
+            <div class="home-row">
+              <div class="home-row-label" data-i18n="inspection_pass">Inspection Pass Rate</div>
+              <div class="home-row-value tabular-nums">90%</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- LINE (single page with tabs) -->
+    <section id="view-line" class="view">
+      <div class="mb-4">
+        <button id="btn-back" class="text-blue-400 hover:underline" data-i18n="back">← Back</button>
+      </div>
+
+      <div class="card p-6">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="text-xl font-semibold">
+            <span id="line-title">Line 1</span>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <!-- <div class="muted hidden sm:block" data-i18n="company_name">대명철강</div> -->
+
+            <div class="text-sm">
+              <span class="muted mr-2" data-i18n="elapse_time">Elapse Time</span>
+              <span id="line-elapsed" class="tabular-nums">00 : 00 : 00</span>
+            </div>
+
+            <div class="view-toggle">
+              <button id="btn-view-metrics" class="view-toggle-btn is-active" data-i18n="metrics">
+                Metrics
+              </button>
+              <button id="btn-view-charts" class="view-toggle-btn" data-i18n="charts">
+                Charts
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Process tabs -->
+        <div class="mt-4 flex flex-wrap gap-2" id="proc-tabs"></div>
+
+        <div class="my-4 divider"></div>
+
+        <!-- ===== Sections ===== -->
+
+        <!-- Uncoiler -->
+        <div id="sec-Uncoiling" class="space-y-4">
+          <div class="text-2xl font-semibold" data-i18n="sec_uncoiling">Uncoiling</div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Power (ON/OFF) -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="power">Power</div>
+              <div class="value-badge" id="val-uncoiler-power">—</div>
+            </div>
+
+            <!-- Hydraulic Motor Status -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="hydraulic_motor">Hydraulic Motor Status</div>
+              <div class="value-badge" id="val-uncoiler-hydraulic">—</div>
+            </div>
+
+            <!-- Brake Status -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="brake_status">Brake Status</div>
+              <div class="value-badge" id="val-uncoiler-brake">—</div>
+            </div>
+
+            <!-- Drum Rotation -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="drum_rotation">Drum Rotation Direction</div>
+              <div class="value-badge" id="val-uncoiler-rotation">—</div>
+            </div>
+
+            <!-- Drum Status -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="drum_status">Drum Status</div>
+              <div class="value-badge" id="val-uncoiler-drum">—</div>
+            </div>
+
+            <!-- Line Stop Indicator -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="line_stop">Line Stop Indicator</div>
+              <div class="value-badge" id="val-uncoiler-line-stop">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Welder -->
+        <div id="sec-Welding" class="space-y-4">
+          <div class="text-2xl font-semibold" data-i18n="sec_welding">Welding</div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Power (On/Off) -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="power">Power</div>
+              <div class="value-badge" id="val-weld-power">—</div>
+            </div>
+
+            <!-- Voltage -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="voltage">Voltage</div>
+              <div class="value-badge" id="val-weld-voltage">—</div>
+            </div>
+
+            <!-- Current -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="current">Current</div>
+              <div class="value-badge" id="val-weld-current">—</div>
+            </div>
+
+            <!-- Cooling Water Temp -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="cooling_temp">Cooling Water Temp</div>
+              <div class="value-badge" id="val-weld-cool">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pipe-End Cutting -->
+        <div id="sec-PipeEndCut" class="space-y-4">
+          <div class="text-2xl font-semibold" data-i18n="sec_pipeendcut">Pipe-End Cutting</div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Auto Operation -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="pipeendcut_auto_op">Auto Operation</div>
+              <div class="value-badge" id="val-pipeendcut-auto-op">—</div>
+            </div>
+
+            <!-- Emergency Stop -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="pipeendcut_emergency_stop">Emergency Stop</div>
+              <div class="value-badge" id="val-pipeendcut-emergency-stop">—</div>
+            </div>
+
+            <!-- Counter Sensor -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="pipeendcut_counter_sensor">Counter Sensor</div>
+              <div class="value-badge" id="val-pipeendcut-counter-sensor">—</div>
+            </div>
+
+            <!-- Operation Mode -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="pipeendcut_operation_mode">Operation Mode</div>
+              <div class="value-badge" id="val-pipeendcut-operation-mode">—</div>
+            </div>
+
+            <!-- Hydraulic Motor -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="pipeendcut_hydraulic_motor">Hydraulic Motor</div>
+              <div class="value-badge" id="val-pipeendcut-hydraulic-motor">—</div>
+            </div>
+
+            <!-- Clamp Status -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="pipeendcut_clamp_status">Clamp Status</div>
+              <div class="value-badge" id="val-pipeendcut-clamp-status">—</div>
+            </div>
+
+            <!-- Head Position -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="pipeendcut_head_position">Head Position</div>
+              <div class="value-badge" id="val-pipeendcut-head-position">—</div>
+            </div>
+
+            <!-- Spindle Motor -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="pipeendcut_spindle_motor">Spindle Motor</div>
+              <div class="value-badge" id="val-pipeendcut-spindle-motor">—</div>
+            </div>
+
+            <!-- Unline Motor -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="pipeendcut_unline_motor">Unline Motor</div>
+              <div class="value-badge" id="val-pipeendcut-unline-motor">—</div>
+            </div>
+
+            <!-- Walking Motor Status -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="pipeendcut_walking_motor_status">Walking Motor Status</div>
+              <div class="value-badge" id="val-pipeendcut-walking-motor-status">—</div>
+            </div>
+
+            <!-- Head Start Sensor -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="pipeendcut_head_start_sensor">Head Start Sensor</div>
+              <div class="value-badge" id="val-pipeendcut-head-start-sensor">—</div>
+            </div>
+
+            <!-- Walking Motor Overload -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="pipeendcut_walking_motor_overload">Walking Motor Overload</div>
+              <div class="value-badge" id="val-pipeendcut-walking-motor-overload">—</div>
+            </div>
+
+            <!-- Square Pipe / Round Pipe Information -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="pipeendcut_square_pipe">Square Pipe / Round Pipe</div>
+              <div class="value-badge" id="val-pipeendcut-square-pipe">—</div>
+            </div>
+
+            <!-- #1 Alignment Motor Overload -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="pipeendcut_alignment_motor_overload_1">#1 Alignment Motor Overload</div>
+              <div class="value-badge" id="val-pipeendcut-alignment-motor-overload-1">—</div>
+            </div>
+
+            <!-- #2 Alignment Motor Overload -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="pipeendcut_alignment_motor_overload_2">#2 Alignment Motor Overload</div>
+              <div class="value-badge" id="val-pipeendcut-alignment-motor-overload-2">—</div>
+            </div>
+
+            <!-- #1 Spindle Motor Overload -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="pipeendcut_spindle_motor_overload_1">#1 Spindle Motor Overload</div>
+              <div class="value-badge" id="val-pipeendcut-spindle-motor-overload-1">—</div>
+            </div>
+
+            <!-- #2 Spindle Motor Overload -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="pipeendcut_spindle_motor_overload_2">#2 Spindle Motor Overload</div>
+              <div class="value-badge" id="val-pipeendcut-spindle-motor-overload-2">—</div>
+            </div>
+
+            <!-- Auto Stop Message -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="pipeendcut_auto_stop_message">Auto Stop Message</div>
+              <div class="value-badge" id="val-pipeendcut-auto-stop-message">—</div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Accumulator -->
+        <div id="sec-Accumulator" class="space-y-4">
+          <div class="text-2xl font-semibold" data-i18n="sec_accumulator">Accumulator</div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Operation Mode -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="operation_mode">Operation Mode</div>
+              <div class="value-badge" id="val-acc-mode">—</div>
+            </div>
+
+            <!-- Sol Valve (ON/OFF) -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="sol_valve">Sol Valve</div>
+              <div class="value-badge" id="val-acc-sol-valve">—</div>
+            </div>
+
+            <!-- Line Speed -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="line_speed">Line Speed</div>
+              <div class="value-badge" id="val-acc-line-speed">—</div>
+            </div>
+
+            <!-- Storage Quantity -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="storage_quantity">Storage Quantity</div>
+              <div class="value-badge" id="val-acc-storage">—</div>
+            </div>
+
+            <!-- Main Motor Status -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="motor_status">Main Motor Status</div>
+              <div class="value-badge" id="val-acc-motor-status">—</div>
+            </div>
+
+            <!-- Sensor Status -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="sensor_status">Sensor Status</div>
+              <div class="value-badge" id="val-acc-sensor-status">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Forming -->
+        <div id="sec-Forming" class="space-y-4">
+          <div class="text-2xl font-semibold" data-i18n="sec_forming">Forming</div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- RPM (Alarm when RPM is 0) -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="rpm">RPM</div>
+              <div class="value-badge" id="val-form-rpm">—</div>
+            </div>
+
+            <!-- Current -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="current">Current</div>
+              <div class="value-badge" id="val-form-current">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cutting -->
+        <div id="sec-Cutting" class="space-y-4">
+          <div class="text-2xl font-semibold" data-i18n="sec_cutting">Cutting</div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Power -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="cut_power">Power</div>
+              <div class="value-badge" id="val-cut-power">—</div>
+            </div>
+
+            <!-- Operation Mode -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="cut_operation_mode">Operation Mode</div>
+              <div class="value-badge" id="val-cut-operation-mode">—</div>
+            </div>
+
+            <!-- Saw Blade Specification Input -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="cut_saw_blade_spec">Saw Blade Specification</div>
+              <div class="value-badge" id="val-cut-saw-blade-spec">—</div>
+            </div>
+
+            <!-- Length Deviation -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="cut_length_deviation">Length Deviation</div>
+              <div class="value-badge" id="val-cut-length-deviation">—</div>
+            </div>
+
+            <!-- Spindle Motor -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="cut_spindle_motor">Spindle Motor</div>
+              <div class="value-badge" id="val-cut-spindle-motor">—</div>
+            </div>
+
+            <!-- Saw Blade Alarm -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="cut_saw_blade_alarm">Saw Blade Alarm</div>
+              <div class="value-badge" id="val-cut-saw-blade-alarm">—</div>
+            </div>
+
+            <!-- Product Specification & Total -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="cut_product_spec">Product Specification & Total</div>
+              <div class="value-badge" id="val-cut-product-spec">—</div>
+            </div>
+
+            <!-- Production Quantity -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="cut_production_quantity">Production Quantity</div>
+              <div class="value-badge" id="val-cut-production-quantity">—</div>
+            </div>
+
+            <!-- Planned Production -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="cut_planned_production">Planned Production</div>
+              <div class="value-badge" id="val-cut-planned-production">—</div>
+            </div>
+
+            <!-- Specification & Quantity -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="cut_spec_quantity">Specification & Quantity</div>
+              <div class="value-badge" id="val-cut-spec-quantity">—</div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Packaging -->
+        <div id="sec-Packaging" class="space-y-4">
+          <div class="text-2xl font-semibold" data-i18n="sec_packaging">Packaging</div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Power -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="packaging_power">Power</div>
+              <div class="value-badge" id="val-packaging-power">—</div>
+            </div>
+
+            <!-- Operation Mode -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="packaging_operation_mode">Operation Mode</div>
+              <div class="value-badge" id="val-packaging-operation-mode">—</div>
+            </div>
+
+            <!-- Hydraulic Motor Status -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="packaging_hydraulic_motor_status">Hydraulic Motor Status</div>
+              <div class="value-badge" id="val-packaging-hydraulic-motor-status">—</div>
+            </div>
+
+            <!-- Emergency Stop Status -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="packaging_emergency_stop_status">Emergency Stop Status</div>
+              <div class="value-badge" id="val-packaging-emergency-stop-status">—</div>
+            </div>
+
+            <!-- Adachi Transfer Inverter Status -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="packaging_adachi_transfer_inverter_status">Adachi Transfer Inverter Status</div>
+              <div class="value-badge" id="val-packaging-adachi-transfer-inverter-status">—</div>
+            </div>
+
+            <!-- Adachi Lift Inverter Status -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="packaging_adachi_lift_inverter_status">Adachi Lift Inverter Status</div>
+              <div class="value-badge" id="val-packaging-adachi-lift-inverter-status">—</div>
+            </div>
+
+            <!-- Adachi Walking Inverter Status -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="packaging_adachi_walking_inverter_status">Adachi Walking Inverter Status</div>
+              <div class="value-badge" id="val-packaging-adachi-walking-inverter-status">—</div>
+            </div>
+
+            <!-- Adachi Layer Inverter Status -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="packaging_adachi_layer_inverter_status">Adachi Layer Inverter Status</div>
+              <div class="value-badge" id="val-packaging-adachi-layer-inverter-status">—</div>
+            </div>
+
+            <!-- Bending Machine Transfer Inverter Status -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="packaging_bending_machine_transfer_inverter_status">Bending Machine Transfer Inverter Status</div>
+              <div class="value-badge" id="val-packaging-bending-machine-transfer-inverter-status">—</div>
+            </div>
+
+            <!-- Output Connection Transfer Inverter Status -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="packaging_output_connection_transfer_inverter_status">Output Connection Transfer Inverter Status</div>
+              <div class="value-badge" id="val-packaging-output-connection-transfer-inverter-status">—</div>
+            </div>
+
+            <!-- Fork Transfer Inverter Status -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="packaging_fork_transfer_inverter_status">Fork Transfer Inverter Status</div>
+              <div class="value-badge" id="val-packaging-fork-transfer-inverter-status">—</div>
+            </div>
+
+            <!-- Output Transfer Inverter Status -->
+            <div class="tile p-3 metric cursor-pointer">
+              <div class="label" data-i18n="packaging_output_transfer_inverter_status">Output Transfer Inverter Status</div>
+              <div class="value-badge" id="val-packaging-output-transfer-inverter-status">—</div>
+            </div>
+          </div>
+        </div>
+
+
+
+        <!-- ===== Alarm Panel ===== -->
+        <div id="alarm-panel" class="space-y-3 mb-6">
+          <div class="flex items-center justify-between">
+            <div class="text-sm font-semibold" data-i18n="alarms">Alarms</div>
+            <div class="alarm-toolbar">
+              <button id="btn-alarm-active" class="btn-small active" data-i18n="active_only">Active only</button>
+              <button id="btn-alarm-all" class="btn-small" data-i18n="all">All</button>
+              <span class="muted text-xs" data-i18n="last_50">(last 50)</span>
+            </div>
+          </div>
+          <div id="alarm-list" class="alarm-list"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- External script -->
+  <script src="script.js"></script>
+</body>
+</html>
